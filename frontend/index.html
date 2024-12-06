@@ -2,252 +2,80 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WorkChat</title>
+    <title>Real Web App</title>
     <link rel="stylesheet" href="styles.css">
-    <style>
-        /* Styles for a clean and responsive UI */
-        body {
-            font-family: Arial, sans-serif;
-            background-color: lightblue;
-            margin: 0;
-            padding: 0;
-        }
-        #app {
-            max-width: 800px;
-            margin: auto;
-            padding: 20px;
-            text-align: center;
-        }
-        .content-box, textarea, input, select, button {
-            margin: 10px 0;
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-        button {
-            background-color: #007bff;
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
-        .hidden {
-            display: none;
-        }
-        .notification {
-            background-color: #28a745;
-            color: white;
-            padding: 10px;
-            margin-top: 10px;
-            border-radius: 5px;
-        }
-        .file-item {
-            margin: 10px 0;
-        }
-    </style>
+    <script defer src="/socket.io/socket.io.js"></script>
+    <script defer src="script.js"></script>
 </head>
 <body>
-    <div id="app">
-        <!-- Welcome/Login/Register Section -->
-        <div id="welcome-auth-section">
-            <h1>Welcome to WorkChat</h1>
-            <p class="author">An app by Gilma Phiri</p>
+    <header>
+        <h1>Real Web App</h1>
+        <nav>
+            <ul>
+                <li><a href="#register-login">Register/Login</a></li>
+                <li><a href="#messaging">Messaging</a></li>
+                <li><a href="#file-sharing">File Sharing</a></li>
+                <li><a href="#notifications">Notifications</a></li>
+                <li><a href="#admin-dashboard">Admin Dashboard</a></li>
+                <li><a href="#fetch-example">Fetch API Example</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <!-- Register & Login -->
+        <section id="register-login">
+            <h2>Register</h2>
+            <form id="register-form">
+                <input type="text" id="reg-username" placeholder="Username" required>
+                <input type="password" id="reg-password" placeholder="Password" required>
+                <button type="submit">Register</button>
+            </form>
 
             <h2>Login</h2>
-            <form id="login-form" onsubmit="event.preventDefault(); handleLogin();">
+            <form id="login-form">
                 <input type="text" id="login-username" placeholder="Username" required>
                 <input type="password" id="login-password" placeholder="Password" required>
                 <button type="submit">Login</button>
             </form>
+        </section>
 
-            <h2>Register</h2>
-            <form id="register-form" onsubmit="event.preventDefault(); handleRegister();">
-                <input type="text" id="register-username" placeholder="Username" required>
-                <input type="password" id="register-password" placeholder="Password" required>
-                <button type="submit">Register</button>
-            </form>
-        </div>
-
-        <!-- Options Page -->
-        <div id="options-page" class="hidden">
-            <h2>Options</h2>
-            <ul>
-                <li><button onclick="navigateTo('messaging-section')">Messaging</button></li>
-                <li><button onclick="navigateTo('file-sharing-section')">File Sharing</button></li>
-                <li><button onclick="navigateTo('notifications-section')">Notifications</button></li>
-                <li><button onclick="navigateTo('admin-dashboard-section')">Admin Dashboard</button></li>
-                <li><button onclick="navigateTo('settings-section')">Settings</button></li>
-                <li><button onclick="navigateTo('email-invite-section')">Email Invite</button></li>
-            </ul>
-        </div>
-
-        <!-- Messaging Section -->
-        <div id="messaging-section" class="hidden">
+        <!-- Messaging -->
+        <section id="messaging">
             <h2>Messaging</h2>
-            <div id="chat-box" class="content-box"></div>
-            <input type="text" id="chat-input" placeholder="Type your message">
-            <button onclick="sendMessage()">Send</button>
-            <input type="file" id="file-upload">
-            <button onclick="sendFile()">Send File</button>
-            <button onclick="goBack()">Back</button>
-        </div>
+            <div id="messages"></div>
+            <input type="text" id="chat-input" placeholder="Type a message">
+            <button id="send-message">Send</button>
+        </section>
 
-        <!-- File Sharing Section -->
-        <div id="file-sharing-section" class="hidden">
+        <!-- File Sharing -->
+        <section id="file-sharing">
             <h2>File Sharing</h2>
-            <input type="file" id="file-upload-sharing" multiple>
-            <button onclick="uploadFile()">Upload</button>
-            <div id="file-list" class="content-box">
-                <h3>Received Files:</h3>
-                <!-- List of received files will be displayed here -->
-            </div>
-            <button onclick="goBack()">Back</button>
-        </div>
-
-        <!-- Notifications Section -->
-        <div id="notifications-section" class="hidden">
-            <h2>Notifications</h2>
-            <div id="notifications-content" class="content-box"></div>
-            <button onclick="goBack()">Back</button>
-        </div>
-
-        <!-- Admin Dashboard Section -->
-        <div id="admin-dashboard-section" class="hidden">
-            <h2>Admin Dashboard</h2>
-            <textarea id="admin-text-box" placeholder="Post an announcement..."></textarea>
-            <button onclick="postAnnouncement()">Post</button>
-            <button onclick="goBack()">Back</button>
-        </div>
-
-        <!-- Settings Section -->
-        <div id="settings-section" class="hidden">
-            <h2>Settings</h2>
-            <label for="color-select">Background Color:</label>
-            <select id="color-select">
-                <option value="white">White</option>
-                <option value="lightblue">Light Blue</option>
-                <option value="lightgreen">Light Green</option>
-                <option value="lightgrey">Light Grey</option>
-                <option value="blue">Blue</option>
-                <option value="red">Red</option>
-                <option value="yellow">Yellow</option>
-                <option value="pink">Pink</option>
-                <option value="teal">Teal</option>
-                <option value="purple">Purple</option>
-            </select>
-            <button onclick="applyBackgroundColor()">Apply</button>
-
-            <label for="font-select">Text Style:</label>
-            <select id="font-select">
-                <option value="Arial">Arial</option>
-                <option value="Verdana">Verdana</option>
-                <option value="Courier">Courier</option>
-                <option value="Georgia">Georgia</option>
-                <option value="Times New Roman">Times New Roman</option>
-                <option value="Tahoma">Tahoma</option>
-                <option value="Comic Sans MS">Comic Sans MS</option>
-            </select>
-            <button onclick="applyFontStyle()">Apply</button>
-
-            <label for="font-size">Font Size:</label>
-            <input type="number" id="font-size" min="10" max="50" placeholder="Font Size">
-            <button onclick="applyFontSize()">Apply</button>
-            <button onclick="goBack()">Back</button>
-        </div>
-
-        <!-- Email Invite Section -->
-        <div id="email-invite-section" class="hidden">
-            <h2>Invite Colleagues</h2>
-            <form id="email-invite-form" onsubmit="event.preventDefault(); sendEmailInvite();">
-                <input type="email" id="email" placeholder="Enter email" required>
-                <button type="submit">Send Invite</button>
+            <form id="file-upload-form">
+                <input type="file" id="file-upload" required>
+                <button type="submit">Upload File</button>
             </form>
-            <p class="link-button">
-                Or <a href="mailto:?subject=Check%20Out%20WorkChat!&body=Hi,%0A%0ACheck%20out%20this%20amazing%20website:%20https://app.netlify.com/sites/example-workchat-com/%0A%0ARegards,%0AYour%20Name">send a website link</a>
-            </p>
-            <button onclick="goBack()">Back</button>
-        </div>
-    </div>
+            <ul id="file-list"></ul>
+        </section>
 
-    <script>
-        // Handle Login
-        function handleLogin() {
-            const username = document.getElementById('login-username').value;
-            const password = document.getElementById('login-password').value;
-            if (username && password) {
-                document.getElementById('welcome-auth-section').classList.add('hidden');
-                document.getElementById('options-page').classList.remove('hidden');
-            }
-        }
+        <!-- Notifications -->
+        <section id="notifications">
+            <h2>Notifications</h2>
+            <div id="notification-list"></div>
+        </section>
 
-        // Handle Registration
-        function handleRegister() {
-            const username = document.getElementById('register-username').value;
-            const password = document.getElementById('register-password').value;
-            if (username && password) {
-                document.getElementById('welcome-auth-section').classList.add('hidden');
-                document.getElementById('options-page').classList.remove('hidden');
-            }
-        }
+        <!-- Admin Dashboard -->
+        <section id="admin-dashboard">
+            <h2>Admin Dashboard</h2>
+            <button id="send-announcement">Post Announcement</button>
+            <ul id="announcement-list"></ul>
+        </section>
 
-        // Navigate to different sections of the app
-        function navigateTo(sectionId) {
-            document.querySelectorAll('div[id$="-section"]').forEach(section => section.classList.add('hidden'));
-            document.getElementById(sectionId).classList.remove('hidden');
-        }
-
-        // Go back to options page
-        function goBack() {
-            document.querySelectorAll('div[id$="-section"]').forEach(section => section.classList.add('hidden'));
-            document.getElementById('options-page').classList.remove('hidden');
-        }
-
-        // Messaging and other functionalities
-        function sendMessage() {
-            const message = document.getElementById('chat-input').value;
-            const chatBox = document.getElementById('chat-box');
-            const messageElement = document.createElement('div');
-            messageElement.textContent = `You: ${message}`;
-            chatBox.appendChild(messageElement);
-            document.getElementById('chat-input').value = '';
-        }
-
-        function sendFile() {
-            const fileInput = document.getElementById('file-upload');
-            const fileList = document.getElementById('file-list');
-            const fileElement = document.createElement('div');
-            fileElement.textContent = `File uploaded: ${fileInput.files[0].name}`;
-            fileList.appendChild(fileElement);
-            fileInput.value = '';
-        }
-
-        function applyBackgroundColor() {
-            const selectedColor = document.getElementById('color-select').value;
-            document.body.style.backgroundColor = selectedColor;
-        }
-
-        function applyFontStyle() {
-            const selectedFont = document.getElementById('font-select').value;
-            document.body.style.fontFamily = selectedFont;
-        }
-
-        function applyFontSize() {
-            const fontSize = document.getElementById('font-size').value;
-            document.body.style.fontSize = `${fontSize}px`;
-        }
-
-        // Email invite
-        function sendEmailInvite() {
-            const email = document.getElementById('email').value;
-            if (email) {
-                alert('Invite sent!');
-            }
-        }
-    </script>
+        <!-- Fetch API Example -->
+        <section id="fetch-example">
+            <h2>Fetch API Example</h2>
+            <p id="output">Loading...</p>
+        </section>
+    </main>
 </body>
 </html>
